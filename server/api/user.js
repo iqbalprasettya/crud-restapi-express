@@ -6,6 +6,8 @@ const GeneralHelper = require("../helpers/generalHelper");
 
 const fileName = "server/api/user.js";
 
+const dataBase = "assets/db.json";
+
 // User List
 const list = async (request, reply) => {
   try {
@@ -36,16 +38,32 @@ const create = async (request, reply) => {
 //  Delete User
 const remove = async (request, reply) => {
   try {
-    const { id } = request.query;
-    const data = await UserHelper.deleteUser({ id });
-    return reply.send(data);
-  } catch (error) {
-    return reply.send(GeneralHelper.errorResponse(error));
+      const { id } = request.query;
+      const response = await UserHelper.deleteUser({ id });
+      return reply.send(response);
+  } catch (err) {
+      return reply.send(GeneralHelper.errorResponse(err));
   }
-};
+}
+
+//  Update User
+const update =   async (request, reply) => {
+  try {
+    let body = request.body;
+    delete body.id;
+    const { id } = request.params;
+    
+    const updatedData = await UserHelper.updateUser(id, body);
+    return reply.code(201).send(updatedData);
+  } catch (err) {
+    return reply.status(400).send(GeneralHelper.errorResponse(err,"Bad Request"));
+  }
+}
+
 
 Router.get("/list", list);
 Router.post("/post", create);
 Router.delete("/delete", remove);
+Router.patch("/update", update);
 
 module.exports = Router;

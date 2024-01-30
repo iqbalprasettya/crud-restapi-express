@@ -29,19 +29,55 @@ const createNewUser = (userData) => {
 };
 
 // delete user
-const deleteUser = (id) => {
+const deleteUser = (dataObject) => {
+  const { id } = dataObject;
   try {
-    console.log(id.id);
-    let users = JSON.parse(fs.readFileSync(dataBase)).filter((user) => user.id !== id.id);
-    fs.writeFileSync(dataBase, JSON.stringify(users));
-    return Promise.resolve(users);
-  } catch (error) {
-    console.log(`Error deleting user: ${error}`);
+    let userData = JSON.parse(fs.readFileSync("./assets/db.json"));
+    userData = _.reject(userData, { id: Number(id) });
+    fs.writeFileSync("./assets/db.json", JSON.stringify(userData));
+    return getUserList({}); //return the updated list of users
+  } catch (err) {
+    throw err;
   }
 };
+// Update Data User
+// const update =   async (request, reply) => {
+//   try {
+//     let body = request.body;
+//     delete body.id;
+//     const { id } = request.params;
+    
+//     const updatedData = await UserHelper.updateUser(id, body);
+//     return reply.code(201).send(updatedData);
+//   } catch (err) {
+//     return reply.status(400).send(GeneralHelper.errorResponse(err,"Bad Request"));
+//   }
+// }
+const updateUser  =  (id , body ) => {  
+  if (!Number(id)) {
+    throw "Invalid ID";
+  } else if(!body || typeof body !== 'object'){
+    throw "No Body Provided or it is not an object" ;
+  }else{
+    return new Promise((reslove, reject)=>{
+      setTimeout(()=>{
+        reslove(_.findWhere(users, {id : id}));
+      },500)
+    })
+  }
+}
+
+
+//     fs.writeFileSync("./assets/db.json", JSON.stringify(userDelete));
+//     return Promise.resolve(userDelete);
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };
 
 module.exports = {
   getUserList,
   createNewUser,
   deleteUser,
+  updateUser,
 };
